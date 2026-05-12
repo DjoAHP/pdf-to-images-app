@@ -26,12 +26,17 @@ export function PdfCard({ pdf }: PdfCardProps) {
   };
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-bg-secondary/50 rounded-lg border border-border-subtle hover:border-border-accent transition-all duration-200">
-      {getStatusIcon()}
-      <div className="flex-1 min-w-0">
-        <p className="text-sm text-text-primary truncate">{pdf.name}</p>
-        <p className="text-xs text-text-muted">{formatSize(pdf.size)}</p>
+    <div className="flex items-center gap-4 p-4 bg-bg-secondary/30 rounded-xl border border-border-subtle hover:border-accent/50 hover:bg-bg-secondary/50 transition-all duration-300 group">
+      <div className="flex-shrink-0">
+        {getStatusIcon()}
       </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-text-primary truncate">{pdf.name}</p>
+        <p className="text-xs text-text-muted mt-1">{formatSize(pdf.size)}</p>
+      </div>
+      {pdf.status === 'done' && (
+        <CheckCircle className="w-5 h-5 text-success opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+      )}
     </div>
   );
 }
