@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import type { PDFFile } from '../types';
 import { PdfCard } from './ui/PdfCard';
+import { Button } from './ui/button';
 import { FileDown, Loader2 } from 'lucide-react';
 
 interface LeftSidebarProps {
@@ -52,17 +53,17 @@ export function LeftSidebar({ pdfs, onAddPdfs, onConvertAll, isConverting }: Lef
   };
 
   return (
-    <div className="w-[300px] h-full bg-bg-primary/80 backdrop-blur-md border-r border-border-subtle flex flex-col">
+    <div className="w-[320px] h-full bg-bg-primary/80 backdrop-blur-xl border-r border-border-subtle flex flex-col">
       {/* Header */}
-      <div className="px-6 py-5 border-b border-border-subtle">
-        <h2 className="text-xl font-semibold text-text-primary tracking-tight">PDFs</h2>
-        <p className="text-xs text-text-muted mt-1">Glissez vos fichiers ou cliquez</p>
+      <div className="px-8 py-6 border-b border-border-subtle">
+        <h2 className="text-2xl font-bold text-text-primary tracking-tight">PDFs</h2>
+        <p className="text-sm text-text-muted mt-1.5">Glissez vos fichiers ou cliquez</p>
       </div>
 
       {/* Drop Zone */}
       <div
-        className={`flex-1 px-6 py-8 overflow-y-auto ${
-          isDragOver ? 'bg-accent/5 border-accent/30' : ''
+        className={`flex-1 px-8 py-12 overflow-y-auto transition-all duration-300 ${
+          isDragOver ? 'bg-accent/5' : ''
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
@@ -71,16 +72,16 @@ export function LeftSidebar({ pdfs, onAddPdfs, onConvertAll, isConverting }: Lef
         {pdfs.length === 0 ? (
           <div
             onClick={handleClick}
-            className="border-2 border-dashed border-border-subtle rounded-2xl p-10 text-center cursor-pointer hover:border-accent/50 hover:bg-accent/5 transition-all duration-300 group"
+            className="border-2 border-dashed border-border-subtle rounded-3xl p-12 text-center cursor-pointer hover:border-accent/50 hover:bg-accent/5 transition-all duration-300 group"
           >
-            <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-bg-secondary/50 flex items-center justify-center group-hover:bg-accent/10 transition-colors duration-300">
-              <FileDown className="w-10 h-10 text-text-muted group-hover:text-accent transition-colors duration-300" />
+            <div className="w-24 h-24 mx-auto mb-6 rounded-3xl bg-bg-secondary/50 flex items-center justify-center group-hover:bg-accent/10 transition-colors duration-300">
+              <FileDown className="w-12 h-12 text-text-muted group-hover:text-accent transition-colors duration-300" />
             </div>
-            <p className="text-text-secondary font-medium">Glissez vos PDF ici</p>
-            <p className="text-sm text-text-muted mt-2">ou cliquez pour sélectionner</p>
+            <p className="text-text-secondary font-semibold text-lg">Glissez vos PDF ici</p>
+            <p className="text-sm text-text-muted mt-2.5">ou cliquez pour sélectionner des fichiers</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {pdfs.map((pdf) => (
               <PdfCard key={pdf.id} pdf={pdf} />
             ))}
@@ -97,24 +98,26 @@ export function LeftSidebar({ pdfs, onAddPdfs, onConvertAll, isConverting }: Lef
       </div>
 
       {/* Convert Button */}
-      <div className="px-6 py-5 border-t border-border-subtle">
-        <button
+      <div className="px-8 py-6 border-t border-border-subtle bg-bg-primary/50 backdrop-blur-sm">
+        <Button
           onClick={onConvertAll}
           disabled={pdfs.length === 0 || isConverting}
-          className="w-full py-3 px-6 bg-gradient-to-r from-accent to-accent/80 hover:from-accent-hover hover:to-accent disabled:opacity-50 disabled:cursor-not-allowed text-text-primary font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-3 shadow-lg shadow-accent/25 hover:shadow-xl hover:shadow-accent/30 disabled:shadow-none"
+          variant="default"
+          size="lg"
+          className="w-full text-base shadow-xl shadow-accent/20 hover:shadow-2xl hover:shadow-accent/30"
         >
           {isConverting ? (
             <>
-              <Loader2 className="w-5 h-5 animate-spin" />
+              <Loader2 className="w-5 h-5 mr-2 animate-spin" />
               <span>Conversion en cours...</span>
             </>
           ) : (
             <>
-              <FileDown className="w-5 h-5" />
-              <span>PDF&gt;Images</span>
+              <FileDown className="w-5 h-5 mr-2" />
+              <span>PDF → Images</span>
             </>
           )}
-        </button>
+        </Button>
       </div>
     </div>
   );
