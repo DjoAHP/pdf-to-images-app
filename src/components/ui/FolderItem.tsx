@@ -16,33 +16,43 @@ export function FolderItem({
   onDownloadFolder,
 }: FolderItemProps) {
   return (
-    <div className="mb-3">
+    <div className="mb-4">
+      {/* Folder Header */}
       <div
-        className="flex items-center gap-3 p-3 bg-bg-secondary/20 rounded-xl hover:bg-bg-secondary/40 cursor-pointer transition-all duration-300 border border-border-subtle/50 hover:border-accent/30"
+        className="flex items-center gap-4 p-4 bg-bg-secondary/20 hover:bg-bg-secondary/40 border border-border-subtle/50 hover:border-accent/30 rounded-2xl cursor-pointer transition-all duration-300"
         onClick={() => onToggle(folder.pdfId)}
       >
-        <div className="flex-shrink-0">
+        {/* Folder Icon */}
+        <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center">
           {folder.isExpanded ? (
-            <FolderOpen className="w-5 h-5 text-accent" />
+            <FolderOpen className="w-6 h-6 text-amber-400" />
           ) : (
-            <Folder className="w-5 h-5 text-accent/80" />
+            <Folder className="w-6 h-6 text-amber-500/80" />
           )}
         </div>
-        <span className="flex-1 text-sm font-medium text-text-primary truncate">{folder.pdfName}/</span>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-semibold text-text-primary truncate">{folder.pdfName}/</p>
+          <p className="text-xs text-text-muted/70 mt-0.5">{folder.images.length} image(s)</p>
+        </div>
+
+        {/* Download Button */}
         <button
           onClick={(e) => {
             e.stopPropagation();
             onDownloadFolder(folder);
           }}
-          className="p-2 hover:bg-accent/20 rounded-lg transition-all duration-300"
+          className="opacity-0 group-hover:opacity-100 flex-shrink-0 w-9 h-9 rounded-xl bg-accent/10 hover:bg-accent/20 flex items-center justify-center transition-all duration-300"
           title="Télécharger le dossier (ZIP)"
         >
-          <Download className="w-4 h-4 text-text-muted hover:text-accent transition-colors" />
+          <Download className="w-4 h-4 text-accent" />
         </button>
       </div>
 
+      {/* Expanded Content */}
       {folder.isExpanded && (
-        <div className="ml-8 mt-2 space-y-2">
+        <div className="ml-10 mt-3 space-y-2 pl-4 border-l-2 border-border-subtle/30">
           {folder.images.map((image) => (
             <ImageItem
               key={image.id}
