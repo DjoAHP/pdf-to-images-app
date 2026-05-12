@@ -15,7 +15,7 @@ function generateId() {
 function App() {
   const [pdfs, setPdfs] = useState<PDFFile[]>([]);
   const { lines, logInfo, logSuccess, logError, logProgress } = useTerminal();
-  const { folders, singleImages, addSingleImage, addFolder, toggleFolder, clearAll } = useImageStore();
+  const { folders, singleImages, addSingleImage, addFolder, toggleFolder } = useImageStore();
 
   const handleImageConverted = useCallback(
     (pdfId: string, images: { name: string; url: string; isFolder: boolean; folderName?: string }[]) => {

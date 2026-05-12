@@ -1,12 +1,11 @@
-import { useState } from 'react';
-import type { ImageFolder } from '../../types';
 import { FolderOpen, Folder, Download } from 'lucide-react';
 import { ImageItem } from './ImageItem';
+import type { ImageFolder, ConvertedImage } from '../../types';
 
 interface FolderItemProps {
   folder: ImageFolder;
   onToggle: (pdfId: string) => void;
-  onDownloadImage: (image: { name: string; url: string }) => void;
+  onDownloadImage: (image: ConvertedImage) => void;
   onDownloadFolder: (folder: ImageFolder) => void;
 }
 
