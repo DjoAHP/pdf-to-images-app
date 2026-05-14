@@ -26,3 +26,6 @@ dist-ssr
 # Untracked / personal files
 session.txt
 .openclaude-profile.json
+
+# Docs & plans d'implémentation
+docs/
