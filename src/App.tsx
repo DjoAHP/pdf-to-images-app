@@ -1,8 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { LeftSidebar } from './components/LeftSidebar';
 import { Terminal } from './components/Terminal';
 import { RightSidebar } from './components/RightSidebar';
 import { AppLayout } from './components/AppLayout';
+import { Header } from './components/Header';
 import { useTerminal } from './hooks/useTerminal';
 import { useImageStore } from './hooks/useImageStore';
 import { usePdfConverter } from './hooks/usePdfConverter';
@@ -14,8 +15,8 @@ function generateId() {
 
 function App() {
   const [pdfs, setPdfs] = useState<PDFFile[]>([]);
-  const { lines, logInfo, logSuccess, logError, logProgress } = useTerminal();
-  const { folders, singleImages, addSingleImage, addFolder, toggleFolder } = useImageStore();
+  const { lines, clearTerminal, logInfo, logSuccess, logError, logProgress } = useTerminal();
+  const { folders, singleImages, addSingleImage, addFolder, toggleFolder, clearAll } = useImageStore();
 
   const handleImageConverted = useCallback(
     (pdfId: string, images: { name: string; url: string; isFolder: boolean; folderName?: string }[]) => {
@@ -71,10 +72,12 @@ function App() {
       }
     },
     onImageConverted: handleImageConverted,
-    onStatusChange: (pdfId, status, totalPages) => {
+    onStatusChange: (pdfId, status, totalPages, progress) => {
       setPdfs((prev) =>
         prev.map((p) =>
-          p.id === pdfId ? { ...p, status, totalPages: totalPages || p.totalPages } : p
+          p.id === pdfId
+            ? { ...p, status, totalPages: totalPages || p.totalPages, progress }
+            : p
         )
       );
     },
@@ -115,17 +118,47 @@ function App() {
     await downloadAllAsZip(singleImages, folders);
   }, [singleImages, folders]);
 
+  const handleClearAll = useCallback(() => {
+    clearAll();
+    setPdfs([]);
+    clearTerminal();
+    logInfo('$ Tout a été effacé');
+  }, [clearAll, clearTerminal, logInfo]);
+
+  const progressPercent = useMemo(() => {
+    if (pdfs.length === 0) return 0;
+    let totalProgress = 0;
+    pdfs.forEach((pdf) => {
+      if (pdf.status === 'done') {
+        totalProgress += 100;
+      } else if (pdf.status === 'converting' && pdf.progress != null && pdf.totalPages) {
+        totalProgress += (pdf.progress / pdf.totalPages) * 100;
+      }
+    });
+    return Math.round(totalProgress / pdfs.length);
+  }, [pdfs]);
+
+  const hasConvertedContent = folders.length > 0 || singleImages.length > 0;
+
   return (
     <AppLayout
+      header={
+        <Header
+          pdfCount={pdfs.length}
+          isConverting={isConverting}
+          progressPercent={progressPercent}
+        />
+      }
       left={
         <LeftSidebar
           pdfs={pdfs}
           onAddPdfs={handleAddPdfs}
           onConvertAll={handleConvertAll}
           isConverting={isConverting}
+          progressPercent={progressPercent}
         />
       }
-      center={<Terminal lines={lines} />}
+      center={<Terminal lines={lines} onClear={clearTerminal} />}
       right={
         <RightSidebar
           folders={folders}
@@ -134,6 +167,8 @@ function App() {
           onDownloadImage={handleDownloadImage}
           onDownloadFolder={handleDownloadFolder}
           onDownloadAll={handleDownloadAll}
+          onClearAll={handleClearAll}
+          hasConvertedContent={hasConvertedContent}
         />
       }
     />

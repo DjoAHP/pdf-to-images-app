@@ -1,73 +1,83 @@
-# React + TypeScript + Vite
+# 📄 PDF to Images Converter
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Convertisseur PDF → images JPG en ligne, moderne et élégant.
 
-Currently, two official plugins are available:
+## Fonctionnalités
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Conversion PDF → JPG** — chaque page est rendue en haute qualité (zoom 3x, qualité 0.95)
+- **Glisser-déposer** — déposez vos fichiers PDF directement dans la zone
+- **Multi-pages** — les PDF multi-pages sont regroupés en dossiers dépliables
+- **Téléchargement** — téléchargez individuellement, par dossier ZIP ou tout en un seul ZIP
+- **Terminal intégré** — suivez la progression en temps réel dans le panneau de logs
+- **Barre de progression** — indicateur global pendant la conversion
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React 19 + TypeScript
+- Vite 8 (build + HMR)
+- Tailwind CSS v4 (dark theme personnalisé)
+- pdfjs-dist 5.7 (moteur PDF.js de Mozilla)
+- JSZip 3 (génération ZIP côté client)
 
-## Expanding the ESLint configuration
+## Développement
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+```bash
+# Installer les dépendances
+npm install
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+# Lancer le serveur de dev
+npm run dev
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+# Build production
+npm run build
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Preview build local
+npm run preview
+
+# Lint
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Structure du projet
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
 ```
+src/
+  main.tsx                → point d'entrée React
+  App.tsx                 → orchestre les hooks et composants
+  index.css               → variables CSS, Tailwind, animations
+  App.css                 → (vide, nettoyé)
+  components/
+    Header.tsx            → barre haute avec compteur + progression
+    AppLayout.tsx         → layout 3 colonnes avec header
+    LeftSidebar.tsx       → upload PDF + liste des fichiers
+    RightSidebar.tsx      → images converties + bouton ZIP
+    Terminal.tsx          → panneau de logs repliable
+    ui/
+      button.tsx          → bouton pill-shape avec variants
+      PdfCard.tsx         → carte PDF avec statut
+      FolderItem.tsx      → dossier dépliable multi-images
+      ImageItem.tsx       → ligne d'image avec bouton DL
+  hooks/
+    usePdfConverter.ts    → logique de conversion PDF.js
+    useImageStore.ts      → state management des images
+    useTerminal.ts        → logs du terminal
+  lib/
+    utils.ts              → helper cn() (clsx + tailwind-merge)
+  types/
+    index.ts              → interfaces TypeScript partagées
+  utils/
+    pdfToImages.ts        → rendu PDF pages via canvas
+    downloadUtils.ts      → génération ZIP (JSZip)
+```
+
+## Design
+
+- Thème sombre avec palette cyan (#22d3ee)
+- Glassmorphism (backdrop-filter blur sur les panneaux)
+- Boutons pill-shape avec glow shadow
+- Animations d'entrée fluides (fade-in, pulse)
+- Scrollbars stylisées custom
+
+## Licence
+
+MIT

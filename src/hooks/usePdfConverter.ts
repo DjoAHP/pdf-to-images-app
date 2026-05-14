@@ -6,7 +6,7 @@ import type { ProgressCallback } from '../utils/pdfToImages';
 interface UsePdfConverterProps {
   onLog: (text: string, type: 'info' | 'success' | 'error' | 'progress') => void;
   onImageConverted: (pdfId: string, images: { name: string; url: string; isFolder: boolean; folderName?: string }[]) => void;
-  onStatusChange: (pdfId: string, status: PDFFile['status'], totalPages?: number) => void;
+  onStatusChange: (pdfId: string, status: PDFFile['status'], totalPages?: number, progress?: number) => void;
 }
 
 export function usePdfConverter({
@@ -18,7 +18,7 @@ export function usePdfConverter({
 
   const convertPdf = useCallback(
     async (pdfFile: PDFFile) => {
-      onStatusChange(pdfFile.id, 'converting', undefined);
+      onStatusChange(pdfFile.id, 'converting', undefined, 0);
       onLog(`$ Conversion de "${pdfFile.name}"...`, 'info');
 
       try {
@@ -27,19 +27,24 @@ export function usePdfConverter({
             `> Page ${progress.currentPage}/${progress.totalPages} convertie (zoom 3x)`,
             'progress'
           );
+          onStatusChange(
+            pdfFile.id,
+            'converting',
+            progress.totalPages,
+            progress.currentPage
+          );
         };
 
         const result = await convertPdfToImages(pdfFile.file, onProgress);
 
         onLog(
-          `> PDF chargé: ${result.images.length} pages détectées`,
+          `> PDF chargé: ${result.images.length} page${result.images.length > 1 ? 's' : ''} détectée${result.images.length > 1 ? 's' : ''}`,
           'progress'
         );
 
         const convertedImages = [];
 
         if (result.isMultiPage) {
-          // Multi-page: create folder structure
           for (let i = 0; i < result.images.length; i++) {
             const pageNum = String(i + 1).padStart(3, '0');
             const filename = `page_${pageNum}.jpg`;
@@ -51,52 +56,41 @@ export function usePdfConverter({
               folderName: result.name,
             });
           }
-          onLog(
-            `✓ "${pdfFile.name}" terminé (${result.images.length} pages)`,
-            'success'
-          );
         } else {
-          // Single page: single image
-          const filename = `${result.name}.jpg`;
           const url = URL.createObjectURL(result.images[0]);
           convertedImages.push({
-            name: filename,
+            name: result.name + '.jpg',
             url,
             isFolder: false,
           });
-          onLog(`✓ "${pdfFile.name}" terminé (1 page)`, 'success');
         }
 
         onImageConverted(pdfFile.id, convertedImages);
         onStatusChange(pdfFile.id, 'done', result.images.length);
+        onLog(`✔ "${pdfFile.name}" converti avec succès (${result.images.length} page${result.images.length > 1 ? 's' : ''})`, 'success');
       } catch (error) {
-        const message = error instanceof Error ? error.message : 'Erreur inconnue';
-        onLog(`✗ Erreur conversion "${pdfFile.name}": ${message}`, 'error');
         onStatusChange(pdfFile.id, 'error');
+        onLog(`✘ Erreur lors de la conversion de "${pdfFile.name}": ${error instanceof Error ? error.message : 'Erreur inconnue'}`, 'error');
       }
     },
     [onLog, onImageConverted, onStatusChange]
   );
 
   const convertAll = useCallback(
-    async (pdfFiles: PDFFile[]) => {
+    async (files: PDFFile[]) => {
+      if (files.length === 0) return;
       setIsConverting(true);
-      const pendingFiles = pdfFiles.filter(f => f.status === 'pending');
+      onLog(`$ Démarrage de la conversion de ${files.length} fichier(s)...`, 'info');
 
-      onLog(`$ Début de la conversion de ${pendingFiles.length} fichier(s)...`, 'info');
-
-      for (const pdfFile of pendingFiles) {
-        await convertPdf(pdfFile);
+      for (const file of files) {
+        await convertPdf(file);
       }
 
-      onLog(`$ Conversion terminée ! (${pendingFiles.length} fichiers traités)`, 'success');
       setIsConverting(false);
+      onLog(`$ Conversion terminée.`, 'success');
     },
-    [convertPdf]
+    [convertPdf, onLog]
   );
 
-  return {
-    isConverting,
-    convertAll,
-  };
+  return { isConverting, convertAll };
 }

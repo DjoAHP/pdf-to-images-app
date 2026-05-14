@@ -1,0 +1,2 @@
+openclaude --resume "PDF-to-Images" 
+openclaude --dangerously-skip-permissions --resume "PDF-to-Images"

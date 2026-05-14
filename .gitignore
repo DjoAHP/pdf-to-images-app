@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Untracked / personal files
+session.txt
+.openclaude-profile.json
